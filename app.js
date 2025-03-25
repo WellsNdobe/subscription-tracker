@@ -4,11 +4,22 @@ import subscriptionRouter from "./routes/subscription.route.js";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import connectDB from "./DB/mongodb.js";
+import errorMiddleware from "./middlewares/error.middleware.js";
+import cookieParser from "cookie-parser";
+import { signUp } from "./controllers/auth.controller.js";
 
 const app = express();
 
-await connectDB(); // Top-level await works if using ES Modules
+// Connect to MongoDB
+await connectDB();
 
+// Middlewares
+app.use(errorMiddleware);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Routes
 app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
