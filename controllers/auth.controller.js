@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/user.model.js"; // Assuming the User model is in models directory
+import User from "../models/user.model.js";
 
 export const signUp = async (req, res, next) => {
   const session = await mongoose.startSession();
@@ -51,6 +51,48 @@ export const signUp = async (req, res, next) => {
   }
 };
 
-export const signIn = async (req, res) => {};
+export const signIn = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-export const signOut = async (req, res) => {};
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("Invalid credentials");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      const error = new Error("Invalid credentials");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: { token, user },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const signOut = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "Sign out successful",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "An error occurred during sign out",
+    });
+  }
+};
