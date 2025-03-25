@@ -19,7 +19,7 @@ export const signUp = async (req, res, next) => {
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUsers = await User.create(
