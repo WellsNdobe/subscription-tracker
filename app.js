@@ -6,7 +6,6 @@ import authRouter from "./routes/auth.routes.js";
 import connectDB from "./DB/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
-import { signUp } from "./controllers/auth.controller.js";
 
 const app = express();
 
